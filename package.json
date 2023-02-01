@@ -12,7 +12,7 @@
     "url": "git+https://github.com/EM-T-Shells/allData_noCigar.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "G.E.T.",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/EM-T-Shells/allData_noCigar/issues"
@@ -21,6 +21,6 @@
   "dependencies": {
     "body-parser": "^1.20.1",
     "express": "^4.18.2",
-    "mongoose": "^6.8.4"
+    "mongoose": "^6.9.0"
   }
 }
