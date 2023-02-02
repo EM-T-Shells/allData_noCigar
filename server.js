@@ -4,9 +4,15 @@ const dotenv = require("dotenv");
 const connectDB = require('./config/db_connection');
 
 const app = express();
+const PORT = process.env.port || 3001;
 dotenv.config();
-connectDB();
 
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(routes);
+
+connectDB.once('open', () => {
+  app.listen(PORT, () => {
+    console.log(`Now listening on at http://localhost:${PORT}`);
+  });
+})
