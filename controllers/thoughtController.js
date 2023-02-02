@@ -1,124 +1,103 @@
-const { ObjectId } = require('mongoose').Types;
-const { Student, Course } = require('../models');
+const { Thought, User } = require('../models');
 
-// Aggregate function to get the number of students overall
-const headCount = async () =>
-  Student.aggregate()
-    .count('studentCount')
-    .then((numberOfStudents) => numberOfStudents);
-
-// Aggregate function for getting the overall grade using $avg
-const grade = async (studentId) =>
-  Student.aggregate([
-    // only include the given student by using $match
-    { $match: { _id: ObjectId(studentId) } },
-    {
-      $unwind: '$assignments',
-    },
-    {
-      $group: {
-        _id: ObjectId(studentId),
-        overallGrade: { $avg: '$assignments.score' },
-      },
-    },
-  ]);
+const thoughtCount = async() =>
+    Thought.aggregate()
+    .count('thoughtCount')
+    .then((numberOfThoughts) => numberOfThoughts);
 
 module.exports = {
-  // Get all students
-  getStudents(req, res) {
-    Student.find()
-      .then(async (students) => {
-        const studentObj = {
-          students,
-          headCount: await headCount(),
+// get all thoughts
+    getThoughts(req, res) {
+        Thought.find()
+        .then(async (thoughts) => {
+        const thoughtObj = {
+            thoughts,
+            thoughtCount: await thoughtCount(),
         };
-        return res.json(studentObj);
-      })
-      .catch((err) => {
+        return res.json(thoughtObj);
+    })
+    .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
-      });
-  },
-  // Get a single student
-  getSingleStudent(req, res) {
-    Student.findOne({ _id: req.params.studentId })
-      .select('-__v')
-      .then(async (student) =>
-        !student
-          ? res.status(404).json({ message: 'No student with that ID' })
-          : res.json({
-              student,
-              grade: await grade(req.params.studentId),
-            })
-      )
-      .catch((err) => {
-        console.log(err);
-        return res.status(500).json(err);
-      });
-  },
-  // create a new student
-  createStudent(req, res) {
-    Student.create(req.body)
-      .then((student) => res.json(student))
-      .catch((err) => res.status(500).json(err));
-  },
-  // Delete a student and remove them from the course
-  deleteStudent(req, res) {
-    Student.findOneAndRemove({ _id: req.params.studentId })
-      .then((student) =>
-        !student
-          ? res.status(404).json({ message: 'No such student exists' })
-          : Course.findOneAndUpdate(
-              { students: req.params.studentId },
-              { $pull: { students: req.params.studentId } },
-              { new: true }
-            )
-      )
-      .then((course) =>
-        !course
-          ? res.status(404).json({
-              message: 'Student deleted, but no courses found',
-            })
-          : res.json({ message: 'Student successfully deleted' })
-      )
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-      });
-  },
+    });
+    },
+// get one thought
+    getSingleThought(req, res) {
+        Thought.findOne({ _id: req.params.thoughtId })
+        .select('-__v')
+        .then((thought) =>
+        !thought
+        ? res.status(404).json({ message: 'No thought with that ID'})
+        : res.json(thought)
+        )
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).json(err)
+        })
+    },
+// create new thought - push thought's _id to user's thoughts array
+    createThought(req,res) {
+        Thought.create(req.body)
+        .then((thought) => {
+            return User.findOneAndUpdate(
+            { username: thought.username },
+            { $addToSet: { thoughts: thought._id } },
+            { new: true })
+        })
+        .then((user) =>
+        !user
+        ? res.status(404).json({ message: 'Thought created, but found no user with that ID' })
+        : res.json('Created thought'))
+        .catch((err) => res.status(500).json(err));
+    },
+// update thought by _id
+    updateThought(req, res) {
+        Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { thoughtText: req.body.thoughtText },
+            { new: true })
+        .then(updatedThought => res.status(200).json(updatedThought))
+        .catch(err => res.status(500).json(err))
+    },
 
-  // Add an assignment to a student
-  addAssignment(req, res) {
-    console.log('You are adding an assignment');
-    console.log(req.body);
-    Student.findOneAndUpdate(
-      { _id: req.params.studentId },
-      { $addToSet: { assignments: req.body } },
-      { runValidators: true, new: true }
-    )
-      .then((student) =>
-        !student
-          ? res
-              .status(404)
-              .json({ message: 'No student found with that ID :(' })
-          : res.json(student)
-      )
-      .catch((err) => res.status(500).json(err));
-  },
-  // Remove assignment from a student
-  removeAssignment(req, res) {
-    Student.findOneAndUpdate(
-      { _id: req.params.studentId },
-      { $pull: { assignment: { assignmentId: req.params.assignmentId } } },
-      { runValidators: true, new: true }
-    )
-      .then((student) =>
-        !student
-          ? res
-              .status(404)
-              .json({ message: 'No student found with that ID :(' })
-          : res.json(student)
-      )
-      .catch((err) => res.status(500).json(err));
-  },
+// delete thought by _id
+    deleteThought(req, res) {
+        Thought.findOneAndDelete({ _id: req.params.thoughtId })
+        .then((thought) => res.json(thought))
+        .catch((err) => res.status(500).json(err));
+    },
+
+// routes for /api/thoughts/:thoughtId/reactions
+
+// post to create reaction
+    createReaction(req, res) {
+        Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $addToSet: { reactions: req.body } },
+            { new: true }
+        )
+        .then((thought) => {
+        !thought
+            ? res.status(404).json({ message: 'No thought found with that ID' })
+            : res.json(thought)
+        })
+        .catch((err) => res.status(500).json(err));
+    },
+// delete by reactionId
+    deleteReaction(req, res) {
+        Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { reactionId: req.params.reactionId } } },
+            { new: true }
+            )
+        .then((thought) => {
+            !thought
+            ? res.status(404).json({ message: 'No thought found with that ID' })
+            : res.json(thought)
+        })
+        .catch(err => res.status(500).json(err))
+    }
 };
+
+
+//A controller can be defined as the entity that will be responsible for manipulating models and initiating the view render process with the data received from the corresponding models.

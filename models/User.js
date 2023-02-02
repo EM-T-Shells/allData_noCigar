@@ -1,7 +1,6 @@
+const { Schema, model } = require('mongoose');
 
-const mongoose = require('mongoose');
-
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
     username: {
         type: String,
         unique: true,
@@ -12,22 +11,22 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        match: [/.+@.+\..+/, 'Please enter a valid e-mail address']
+        match: [/.+@.+\..+/, 'Please enter a valid e-mail address'] //This regex is used to validate an email address. It checks for one or more characters before the @ symbol, one or more characters after the @ symbol, and one or more characters after the period.
     },
     thoughts: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'Thought'
         }
     ],
     friends: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'User'
         }
     ]
 });
 
-const User = mongoose.model('User', UserSchema);
+const User = model('User', UserSchema);
 
 module.exports = User;
