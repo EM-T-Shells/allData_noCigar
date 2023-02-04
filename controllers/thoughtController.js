@@ -1,12 +1,19 @@
 const { User, Thought } = require("../models");
-
 const thoughtCount = async () =>
   Thought.aggregate()
     .count("thoughtCount")
     .then((numberOfThoughts) => numberOfThoughts);
-
+const reactionCount = async (thoughtId) => {
+  let reactionQuery = {};
+  if (thoughtId) {
+    reactionQuery.thoughtId = thoughtId;
+  }
+  return Reaction.aggregate()
+    .count("reactionCount")
+    .where(reactionQuery)
+    .then((numberOfReactions) => numberOfReactions);
+};
 module.exports = {
-
   getThoughts(req, res) {
     Thought.find()
       .then(async (thoughts) => {
@@ -21,7 +28,6 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
       .select("-__v")
@@ -35,7 +41,6 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-
   createThought(req, res) {
     Thought.create(req.body)
       .then((thought) => {
@@ -56,7 +61,6 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
-
   updateThought(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
@@ -66,7 +70,6 @@ module.exports = {
       .then((updatedThought) => res.status(200).json(updatedThought))
       .catch((err) => res.status(500).json(err));
   },
-
   deleteThought(req, res) {
     Thought.findOneAndDelete(
       { _id: req.params.thoughtId },
@@ -79,8 +82,50 @@ module.exports = {
       }
     )
   },
-
-  // routes for /api/thoughts/:thoughtId/reactions
+  getReactions(req, res) {
+    Reaction.find()
+      .then(async (reactions) => {
+        const reactionObj = {
+          reactions,
+          reactionCount: await reactionCount(),
+        };
+        return res.json(reactionObj);
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json(err);
+      });
+  },
+  getSingleReaction(req, res) {
+    Reaction.findOne({ _id: req.params.reactionId })
+    .select("-__v")
+    .then((reaction) =>
+      !reaction
+        ? res.status(404).json({ message: "No reaction with that ID" })
+        : res.json(reaction)
+    )
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json(err);
+    });
+  },
+  updateReaction(req, res) {
+    const { reactionId } = req.params;
+    const { reaction } = req.body;
+    Reaction.findByIdAndUpdate(reactionId, reaction, { new: true })
+      .then((updatedReaction) => {
+        if (!updatedReaction) {
+          return res.status(404).json({
+            message: "Reaction not found",
+          });
+        }
+        return res.json(updatedReaction);
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json(err);
+      });
+  },
   addReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
@@ -94,7 +139,6 @@ module.exports = {
       })
       .catch((err) => res.status(500).json(err));
   },
-
   removeReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },

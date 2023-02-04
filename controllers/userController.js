@@ -3,7 +3,6 @@ const userCount = async () =>
   User.aggregate()
     .count("userCount")
     .then((numberOfUsers) => numberOfUsers);
-// . /api/users/
 module.exports = {
   getUsers(req, res) {
     User.find()
@@ -62,7 +61,6 @@ module.exports = {
       })
       .catch((err) => res.status(500).json(err));
   },
-  // . /api/users/:userId/friends/:friendId
   addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
