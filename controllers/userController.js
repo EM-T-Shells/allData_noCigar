@@ -1,13 +1,10 @@
 const { User, Thought } = require("../models");
-
 const userCount = async () =>
   User.aggregate()
     .count("userCount")
     .then((numberOfUsers) => numberOfUsers);
-
-// routes for /api/users/
+// . /api/users/
 module.exports = {
-  // get all users
   getUsers(req, res) {
     User.find()
       .then(async (users) => {
@@ -22,7 +19,6 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-  // get a single user by _id, populated thought and friend data
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId })
       .select("-__v")
@@ -36,13 +32,11 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-  // post a new user
   createUser(req, res) {
     User.create(req.body)
       .then((user) => res.json(user))
       .catch((err) => res.status(500).json(err));
   },
-  // put to update a user by _id
   updateUser(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
@@ -52,19 +46,23 @@ module.exports = {
       .then((updatedUser) => res.status(200).json(updatedUser))
       .catch((err) => res.status(500).json(err));
   },
-  // delete to remove user by _id and associated thoughts
-  deleteUser(req, res) {
+  deleteUserThgtRx(req, res) {
     User.findOneAndDelete({ _id: req.params.userId })
       .then((user) => {
-        return Thought.deleteMany({ _id: { $in: user.thoughts } });
+        return Promise.all([
+          Thought.deleteMany({ _id: { $in: user.thoughts } }),
+          Thought.updateMany(
+            { _id: { $in: user.reactions } },
+            { $pull: { reactions: user._id } }
+          )
+        ]);
       })
       .then(() => {
         res.status(200).json({ message: "User deleted and thoughts" });
       })
       .catch((err) => res.status(500).json(err));
   },
-  // routes for /api/users/:userId/friends/:friendId
-  // post to add new friend to user's friend list
+  // . /api/users/:userId/friends/:friendId
   addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
@@ -72,10 +70,8 @@ module.exports = {
       { new: true }
     )
       .then((user) => res.json(user))
-
       .catch((err) => res.status(500).json(err));
   },
-  // delete to remove friend from friend list
   removeFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
