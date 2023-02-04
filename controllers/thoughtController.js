@@ -28,6 +28,8 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+  deleteThoughts(req, res){
+  },
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
       .select("-__v")
@@ -95,6 +97,8 @@ module.exports = {
         console.log(err);
         return res.status(500).json(err);
       });
+  },
+  removeReactions(req, res){
   },
   getSingleReaction(req, res) {
     Reaction.findOne({ _id: req.params.reactionId })

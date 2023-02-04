@@ -45,7 +45,9 @@ module.exports = {
       .then((updatedUser) => res.status(200).json(updatedUser))
       .catch((err) => res.status(500).json(err));
   },
-  deleteUserThgtRx(req, res) {
+  deleteUsers(req, res){
+  },
+  deleteSingleUser(req, res) {
     User.findOneAndDelete({ _id: req.params.userId })
       .then((user) => {
         return Promise.all([
