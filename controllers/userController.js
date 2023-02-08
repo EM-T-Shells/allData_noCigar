@@ -19,7 +19,7 @@ module.exports = {
   },
   getSingleUser: async (req, res) => {
     try {
-      const user = await User.findOne({ _id: req.params.userId }).select("-__v");
+      const user = await User.findById({ _id: req.params.userId }).select("__v");
       if (!user) {
         return res.status(404).json({ message: "No user with that ID" });
       }
@@ -49,15 +49,6 @@ module.exports = {
       return res.status(500).json(err);
     }
   },
-  deleteUsers: async (req, res) => {
-    try {
-      await User.deleteMany({});
-      await Thought.deleteMany({});
-      await Reaction.deleteMany({});
-    } catch (err) {
-      return res.status(500).json(err);
-    }
-  },
   deleteSingleUser: async (req, res) => {
     try {
       const user = await User.findOneAndDelete({ _id: req.params.userId });
@@ -75,9 +66,9 @@ module.exports = {
   },
   addFriend: async (req, res) => {
     try {
-      const user = await User.findOneAndUpdate(
+      const user = await User.findByIdAndUpdate( // friend is a field within the user document. so we update the friends array field within the user document. constrasts with a subdocument i.e Reaction schema
         { _id: req.params.userId },
-        { $addToSet: { friends: req.params.friendId } },
+        { $addToSet: { friends: mongoose.Types.ObjectId(req.params.friendId) } }, // convert string to ObjectId
         { new: true }
       );
       return res.json(user);
@@ -89,7 +80,7 @@ module.exports = {
     try {
       const user = await User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $pull: { friends: req.params.friendId } },
+        { $pull: { friends: mongoose.Types.ObjectId(req.params.friendId) } },
         { new: true }
       );
       if (!user) {
@@ -101,3 +92,5 @@ module.exports = {
     }
   },
 };
+
+// Mongoose.Types is a library of types that are available for use with Mongoose. It includes utilities for converting between JavaScript objects, strings, and other data types. It also provides access to the ObjectId type which is used when referencing documents in a MongoDB database.

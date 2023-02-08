@@ -1,9 +1,8 @@
-const { ObjectId } = require("mongodb");
+const { ObjectId } = require("mongodb"); //This syntax indicates that the Reaction schema requires the ObjectId data type from the MongoDB library. ObjectId represents a 12-byte BSON type used to uniquely identify documents in MongoDB.
 const { Schema } = require("mongoose");
-
 const reactionSchema = new Schema({
   reactionId: {
-    type: ObjectId,
+    type: ObjectId, // ObjectId is a 12-byte BSON type used to uniquely identify documents in MongoDB
     default: new ObjectId(),
   },
   reactionBody: {
@@ -21,7 +20,6 @@ const reactionSchema = new Schema({
     get: (date) => (date ? date.toISOString().split("T")[0] : null),
   },
 });
-
 module.exports = reactionSchema;
 
 //The letter 'T' is used as the separator character because it is the standard separator character used in ISO 8601 date strings.

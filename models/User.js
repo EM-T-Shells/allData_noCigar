@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-
 const userSchema = new Schema({
     username: {
         type: String,
@@ -26,12 +25,9 @@ const userSchema = new Schema({
         }
     ]
 });
-
 userSchema.virtual('friendCount')
 .get(function() {
     return this.friends.length;
-});
-
+}); // a virtual field can be used to take two pre-defined items and create a new item by merging them. For example, a virtual field may be used to compute a full name field from a first name and last name field.
 const User = model('User', userSchema);
-
 module.exports = User;
