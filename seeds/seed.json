@@ -1,0 +1,61 @@
+[
+  {
+    "username": "Dean Moriarty",
+    "email": "dean@ontheroad.com",
+    "thoughts": [
+      {
+        "thoughtText": "The best way to predict the future is to create it.",
+        "username": "Dean Moriarty",
+        "reactions": [
+          {
+
+          }
+        ]
+      }
+    ],
+    "friends": []
+  },
+  {
+    "username": "Sal Paradise",
+    "email": "sal@ontheroad.com",
+    "thoughts": [
+      {
+        "thoughtText": "Innovation distinguishes between a leader and a follower.",
+        "username": "Sal Paradise",
+        "reactions": []
+      }
+    ],
+    "friends": []
+  },
+  {
+    "username": "Carlo Marx",
+    "email": "carlo@ontheroad.com",
+    "thoughts": [
+      {
+        "thoughtText": "The only way to do great work is to love what you do.",
+        "username": "Carlo Marx",
+        "reactions": []
+      }
+    ],
+    "friends": []
+  },
+  {
+    "username": "Chad King",
+    "email": "chad@ontheroad.com",
+    "thoughts": [
+      {
+        "thoughtText": "Failure is the condiment that gives success its flavor.",
+        "username": "Chad King",
+        "reactions": []
+      }
+    ],
+    "friends": []
+  },
+  {
+    "userCount": [
+      {
+        "userCount": 4
+      }
+    ]
+  }
+]
