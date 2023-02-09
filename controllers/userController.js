@@ -41,7 +41,7 @@ module.exports = {
   updateUser: async (req, res) => {
     try {
       const updatedUser = await User.findOneAndUpdate(
-        { _id: req.params.userId },
+        { _id: req.params.id },
         { $set: req.body },
         { new: true }
       );
@@ -52,7 +52,7 @@ module.exports = {
   },
   deleteSingleUser: async (req, res) => {
     try {
-      const user = await User.findOneAndDelete({ _id: req.params.userId });
+      const user = await User.findOneAndDelete({ _id: req.params.id });
       await Promise.all([
         Thought.deleteMany({ _id: { $in: user.thoughts } }),
         Thought.updateMany(
