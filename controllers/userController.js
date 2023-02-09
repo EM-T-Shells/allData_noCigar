@@ -4,6 +4,7 @@ const userCount = async () =>
   User.aggregate()
     .count("userCount")
     .then((numberOfUsers) => numberOfUsers);
+
 module.exports = {
   getUsers: async (req, res) => {
     try {
