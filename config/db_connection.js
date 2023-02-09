@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
-mongoose.set('strictQuery', false);
-const connectionString = process.env.MONGODB_URI || `mongodb://127.0.0.1:27017/allData_noCigar`;
-mongoose.connect(connectionString,
+// mongoose.set('strictQuery', false);
+
+// const connectionString = process.env.MONGODB_URI || `mongodb://localhost:27017/allData_noCigar`;
+
+mongoose.connect("mongodb://127.0.0.1:27017/allData_noCigar",
 {
     useNewUrlParser: true,
     useUnifiedTopology: true,

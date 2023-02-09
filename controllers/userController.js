@@ -1,4 +1,5 @@
 const { User, Thought } = require("../models");
+
 const userCount = async () =>
   User.aggregate()
     .count("userCount")
@@ -19,7 +20,7 @@ module.exports = {
   },
   getSingleUser: async (req, res) => {
     try {
-      const user = await User.findById({ _id: req.params.userId }).select("__v");
+      const user = await User.findOne({ _id: req.params.id }).select("-__v");
       if (!user) {
         return res.status(404).json({ message: "No user with that ID" });
       }
